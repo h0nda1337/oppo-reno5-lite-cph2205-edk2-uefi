@@ -12,7 +12,8 @@ STATIC BOOLEAN AlignedRange (OPPO_MEMORY_RANGE R)
 
 EFI_STATUS EFIAPI OppoPlanEarlyMemory (
   IN CONST OPPO_BOOT_HANDOFF *Handoff, IN OPPO_MEMORY_RANGE Image,
-  IN OPPO_MEMORY_RANGE Pool, OUT OPPO_EARLY_MEMORY_PLAN *Plan
+  IN OPPO_MEMORY_RANGE Pool, IN BOOLEAN ReserveStaticForOs,
+  OUT OPPO_EARLY_MEMORY_PLAN *Plan
   )
 {
   OPPO_EARLY_MEMORY_PLAN Candidate;
@@ -43,8 +44,14 @@ EFI_STATUS EFIAPI OppoPlanEarlyMemory (
         return EFI_COMPROMISED_DATA;
     }
     Candidate.Protected[Index] = R;
-    Candidate.ProtectedType[Index] = Flags & (OPPO_RESERVATION_NO_MAP | OPPO_RESERVATION_MEMRESERVE) ?
-                                      EfiReservedMemoryType : EfiBootServicesData;
+    Candidate.ProtectedWriteBack[Index] =
+      (BOOLEAN)((Flags & (OPPO_RESERVATION_NO_MAP | OPPO_RESERVATION_MEMRESERVE)) == 0);
+    if (!Candidate.ProtectedWriteBack[Index] ||
+        (ReserveStaticForOs && (Flags & OPPO_RESERVATION_BOOT_DATA) == 0)) {
+      Candidate.ProtectedType[Index] = EfiReservedMemoryType;
+    } else {
+      Candidate.ProtectedType[Index] = EfiBootServicesData;
+    }
     Candidate.ProtectedCount++;
   }
   if (!OppoLoadRegionIsUsable (TRUE, Image.Base, Image.Length, Handoff->Ram, Handoff->RamCount,
@@ -71,7 +78,8 @@ EFI_STATUS EFIAPI OppoPlanAdditionalMemory (
   if (Additional == NULL || !AlignedRange (Window) ||
       Window.Length < 16 * 1024 * 1024 || Window.Length > 0x80000000ULL)
     return EFI_INVALID_PARAMETER;
-  EFI_STATUS Status = OppoPlanEarlyMemory (Handoff, Image, Pool, &Early);
+  // Only the exclusion ranges are needed here, so ownership types are immaterial.
+  EFI_STATUS Status = OppoPlanEarlyMemory (Handoff, Image, Pool, FALSE, &Early);
   if (Status != EFI_SUCCESS) return Status;
   // A window must fit a declared bank, and may not reuse the initial regions.
   if (!OppoLoadRegionIsUsable (TRUE, Window.Base, Window.Length, Handoff->Ram,

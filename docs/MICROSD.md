@@ -1131,3 +1131,95 @@ El objetivo WinPE utilizable y después Windows 11 ARM sigue sin cumplirse;
 el trabajo queda en pausa por solicitud del propietario.
 
 Véase [el resultado físico y el estado de cierre del 38](../evidence/winpe-reference-parameters-lab-38-validation.json).
+
+## Reservas estáticas en el arranque ACPI (39)
+
+Windows no recibe el árbol de dispositivos que LK entrega a EDK2. En el
+perfil ACPI, el firmware conserva las reservas estáticas en el mapa UEFI
+como `EfiReservedMemoryType`. Los rangos del FDT y del initrd siguen siendo
+`EfiBootServicesData`. Se mantienen los mapeos de SEC del intento 38 para
+aislar el cambio de propiedad de esas páginas.
+
+Sobre la [captura del árbol del OPPO](../evidence/runtime-linux-observations.json),
+dos reservas de registros cambian de tipo: `log_store` y `gz-log`, 129 páginas
+en total. Pasaron las pruebas del planificador con ASan y UBSan, la compilación
+ARM64 y la comprobación del empaquetado privado. Al comparar los 26 módulos
+con el firmware del 38, SEC fue el único con cambios además del reajuste de las
+direcciones de carga. Antes del arranque se verificaron en Android los hashes
+de los 89 archivos de WinPE del intento 38 en la tarjeta. El plan de PC no
+determina la causa de `SYSTEM_PTE_MISUSE`.
+
+### Resultado físico del intento 39
+
+![Consola de WinPE en el OPPO](images/native-winpe-reserved-memory-lab-39-console.jpg)
+
+Las [dos fotos revisadas](../evidence/winpe-reserved-memory-lab-39-photos.json)
+muestran una ventana de `cmd.exe` sobre el fondo de WinPE. El interior de la
+consola aparece vacío y el aviso Orange State sigue visible. Es la primera
+captura del entorno de usuario de WinPE desde la microSD física del OPPO.
+Quedan por comprobar la ejecución de comandos y la entrada interactiva.
+
+El propietario informó que la pantalla seguía igual y que el hub USB parecía
+estar sin alimentación. No se midió VBUS ni se confirmó la enumeración del
+teclado. El observador ADB confirmó que Android volvió a completar su inicio.
+
+### Diagnóstico de `Startnet.cmd` (40)
+
+Se preparó una copia privada del mismo medio con dos marcas de consola. La
+primera se imprime antes de `wpeinit` y ejecuta `ver` automáticamente. La
+segunda muestra el código de retorno de `wpeinit`. La verificación del WIM
+comparó 17 533 rutas y detectó cambios en el contenido de un solo archivo,
+`Windows/System32/startnet.cmd`. El empaquetado también ajustó los metadatos
+de ese archivo y separó su vínculo con la copia en WinSxS, cuyo contenido se
+conservó. Entre los 89 archivos del medio solo difiere `sources/boot.wim`.
+
+En la VM ARM64 EL1/SMC, el script mostró la versión `10.0.26100.1`,
+`wpeinit` devolvió `0` y apareció el prompt `X:\Windows\System32>`. La
+salida se obtuvo automáticamente, sin entrada de teclado. El objetivo de
+la prueba física es localizar la etapa alcanzada en el OPPO con el mismo
+firmware del 39. Antes de solicitar el arranque se verificaron los 89 hashes
+de la microSD y la presencia de las 681 rutas del respaldo original. Se guardó
+una copia verificada del WIM del 38 para poder restaurarla.
+
+En la primera prueba física del 40, Fastboot aceptó entrar en recovery sin
+reescribir la partición. El propietario vio el menú de recovery de ColorOS.
+Android volvió a completar el arranque y el hash del WIM activo seguía
+coincidiendo con la copia del 40. Esta entrada no probó WinPE. La imagen
+vigente de recovery no era legible desde el usuario de ADB, por lo que no se
+determinó si Android había restaurado automáticamente el recovery original.
+La inspección del firmware original F.72 sí encontró el servicio de arranque
+`vendor_flash_recovery` y su script de restauración. Comprueba el hash de
+recovery y puede reconstruirlo desde `boot` con el parche del fabricante.
+Los tamaños y hashes esperados coinciden con los respaldos del OPPO.
+
+En el segundo intento se volvió a escribir el recovery verificado del 39 y
+se solicitó la entrada directa desde Fastboot. La foto muestra
+`OPPO WinPE ARM64 Startup Diagnostic`, el título que establece
+`Startnet.cmd` justo antes del primer `echo`. El cuerpo de la ventana quedó
+vacío según las fotos y el propietario. El título acredita que se ejecutó
+parte del script. La salida de `ver` y el resultado de `wpeinit` siguen sin
+confirmarse en el OPPO. [Evidencia fotográfica](../evidence/winpe-startnet-marker-lab-40-photos.json)
+
+Durante el logo de Windows apareció el aviso de EDK II
+`ConvertPages: range … covers multiple entries`. El arranque avanzó hasta
+la consola después del aviso. Su relación con la salida en blanco sigue
+sin establecerse. Tras la prueba se verificó por ADB que Android completó
+el arranque. El observador inicial había agotado su plazo antes de esa
+verificación.
+
+### Diagnóstico por título de consola (41)
+
+La variante del WIM conserva `wpeinit` y añade cuatro etapas al título. Las
+dos primeras rodean el primer `echo`. La tercera muestra el resultado de
+`ver` leído de un archivo temporal y se imprime antes del segundo `echo`
+y de `wpeinit`. La cuarta añade el código de retorno de `wpeinit`.
+
+La comprobación de 17 533 rutas del WIM detectó un único cambio de datos,
+en `Windows/System32/startnet.cmd`, y conservó los metadatos comparados.
+La VM ARM64 EL1/SMC mostró `OPPO PE41 4 WPEINIT=0` con la versión
+`10.0.26100.1` en el título y llegó al prompt. Falta comprobar en el OPPO
+si el título progresa y si la consola admite entrada física.
+
+Antes de la prueba física se verificaron los 89 archivos activos de la
+microSD y se guardó el WIM anterior para restaurarlo. Fastboot confirmó que
+se volvió a escribir el recovery del 39 y aceptó el arranque directo.

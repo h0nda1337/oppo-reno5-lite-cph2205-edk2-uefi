@@ -13,6 +13,7 @@ typedef struct {
   OPPO_MEMORY_RANGE Pool;
   OPPO_MEMORY_RANGE Protected[OPPO_MAX_BOOT_RESERVATIONS + 1];
   EFI_MEMORY_TYPE ProtectedType[OPPO_MAX_BOOT_RESERVATIONS + 1];
+  BOOLEAN ProtectedWriteBack[OPPO_MAX_BOOT_RESERVATIONS + 1];
   UINTN ProtectedCount;
   UINT32 DynamicReservationsDeferredToOs;
   UINT32 EmptyNodesIgnored;
@@ -30,11 +31,14 @@ typedef struct {
   and chosen pool are candidates for initial UEFI-owned RAM; this is not a map of
   all DRAM. Dynamic DT reservations remain deferred to the OS per DTSpec 3.5.4.
   Nonempty unresolved nodes and overlapping rounded exclusions are rejected.
+  ReserveStaticForOs retains fixed reservations in the UEFI map when the OS
+  does not receive the platform DT. It does not change firmware mappings.
   Failure leaves Plan unchanged.
 **/
 EFI_STATUS EFIAPI OppoPlanEarlyMemory (
   IN CONST OPPO_BOOT_HANDOFF *Handoff, IN OPPO_MEMORY_RANGE Image,
-  IN OPPO_MEMORY_RANGE Pool, OUT OPPO_EARLY_MEMORY_PLAN *Plan
+  IN OPPO_MEMORY_RANGE Pool, IN BOOLEAN ReserveStaticForOs,
+  OUT OPPO_EARLY_MEMORY_PLAN *Plan
   );
 
 /** Plan additional RAM within one bounded, page-aligned window (16 MiB..2 GiB).

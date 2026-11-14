@@ -1,0 +1,48 @@
+{
+  "attempt": 39,
+  "physical_observations": {
+    "command_window_visible": true,
+    "console_output_visible_in_photos": false,
+    "command_execution_confirmed_on_device": false,
+    "windows_stop_screen_visible_in_photos": false,
+    "orange_state_visible": true
+  },
+  "owner_report_after_photos": "The USB hub appeared to receive no power and the console did not respond. The owner later reported that the phone was accessible by ADB.",
+  "post_attempt_adb_verification": {
+    "model": "CPH2205",
+    "sys.boot_completed": "1"
+  },
+  "limits": "The photos establish that WinPE displayed a command window on the OPPO. They do not establish that startup initialization completed, the console accepted input, or a command ran. The reason the console remained blank and the cause of the USB symptom were not established.",
+  "photos": [
+    {
+      "public_path": "docs/images/native-winpe-reserved-memory-lab-39-console.jpg",
+      "bytes": 924701,
+      "sha256": "80b4fbd37c380deef5fb0f6d298d9f8528dffab27adcd6e66ac641569d2c2b2b",
+      "source_orientation_tag": 1,
+      "orientation": 1,
+      "icc_segments_preserved": 1,
+      "compressed_pixel_scans_preserved": true,
+      "compressed_scan_sha256": "94da1553f0cfe807705f230e7d9afbd4fef4405a02aca6e497cb0f3d72947371",
+      "retained_exif_tags": [
+        "Orientation"
+      ],
+      "visual_review": "Wide view of the physical OPPO with a Windows command window over the blue WinPE background. The title appears to end in cmd.exe - startnet.cmd. The console area is blank and the yellow Orange State notice remains visible.",
+      "visible_personal_identifiers": false
+    },
+    {
+      "public_path": "docs/images/native-winpe-reserved-memory-lab-39-console-detail.jpg",
+      "bytes": 1008440,
+      "sha256": "83b72b861568c085598eb12705e05edfbcdbc0a952318180f03d329229542fd8",
+      "source_orientation_tag": 1,
+      "orientation": 1,
+      "icc_segments_preserved": 1,
+      "compressed_pixel_scans_preserved": true,
+      "compressed_scan_sha256": "cef40de6f4efd15c5de83eba7cb4dd542a1ff3beb4042122b309fecdf8497936",
+      "retained_exif_tags": [
+        "Orientation"
+      ],
+      "visual_review": "Close view of the physical command window. The title shows X:\\Windows\\System32\\cmd.exe and the console area is blank. The yellow Orange State notice remains visible.",
+      "visible_personal_identifiers": false
+    }
+  ]
+}

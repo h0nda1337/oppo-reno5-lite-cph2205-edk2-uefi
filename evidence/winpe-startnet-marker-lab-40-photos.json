@@ -1,0 +1,33 @@
+{
+  "attempt": 40,
+  "variant": "Direct retry with the verified phase 39 firmware and phase 40 WinPE medium",
+  "physical_observations": {
+    "expected_diagnostic_console_title": "OPPO WinPE ARM64 Startup Diagnostic",
+    "diagnostic_console_title_visible": true,
+    "before_wpeinit_text_marker_visible": false,
+    "ver_output_visible": false,
+    "after_wpeinit_text_marker_visible": false,
+    "interactive_prompt_visible": false,
+    "orange_state_visible": true,
+    "earlier_photo_retained_privately": "Windows logo with a red ConvertPages range warning stating that the range covers multiple entries. The image contains a reflection and stays private. Precise address digits are not accepted as a transcription."
+  },
+  "vm_comparison": "Generic ARM64 VM displayed both phase 40 text markers, version 10.0.26100.1, wpeinit exit code 0 and the interactive prompt.",
+  "limits": "The physical title confirms the title command from the modified startup script took effect. The blank console gives no visible result for ver, wpeinit, or keyboard interaction. The photographs do not establish a relationship between the earlier memory warning and the blank console.",
+  "photos": [
+    {
+      "public_path": "docs/images/native-winpe-startnet-marker-lab-40-console.jpg",
+      "bytes": 1021640,
+      "sha256": "3e57b6283ab6877aba64cb78e4d6ea7a917d2584c5c42a289f9e20e59b7f07a7",
+      "source_orientation_tag": 1,
+      "orientation": 1,
+      "icc_segments_preserved": 1,
+      "compressed_pixel_scans_preserved": true,
+      "compressed_scan_sha256": "3c31d34ac60f6606a10e42be308084096c158bb490ae8bdf2709f7235156a34f",
+      "retained_exif_tags": [
+        "Orientation"
+      ],
+      "visible_personal_identifiers": false,
+      "visual_review": "On the physical OPPO, the window title shows OPPO WinPE ARM64 Startup Diagnostic. The console is blank and Orange State remains visible."
+    }
+  ]
+}

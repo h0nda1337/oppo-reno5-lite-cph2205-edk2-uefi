@@ -23,7 +23,7 @@ static void synthetic(void)
   OPPO_BOOT_HANDOFF info = fixture(), changed;
   OPPO_EARLY_MEMORY_PLAN plan, before;
   OPPO_MEMORY_RANGE image = {0x40080000, 0x800000}, pool = {0x43000000, 0x4000000};
-  assert(OppoPlanEarlyMemory(&info, image, pool, &plan) == EFI_SUCCESS);
+  assert(OppoPlanEarlyMemory(&info, image, pool, FALSE, &plan) == EFI_SUCCESS);
   assert(plan.ProtectedCount == 3 && plan.DynamicReservationsDeferredToOs == 6 && plan.EmptyNodesIgnored == 1);
   assert(plan.Protected[1].Base == 0x57300000 && plan.Protected[1].Length == 0x3b000);
   assert(plan.ProtectedType[0] == EfiReservedMemoryType && plan.ProtectedType[1] == EfiBootServicesData);
@@ -38,19 +38,40 @@ static void synthetic(void)
     if (i == 4) changed.ReservedCount = OPPO_MAX_BOOT_RESERVATIONS + 1;
     if (i == 5) changed.Reserved[1].Base = changed.Reserved[0].Base + 1;
     if (i == 6) changed.ReservedFlags[0] = 0x80000000;
-    assert(OppoPlanEarlyMemory(&changed, image, pool, &plan) != EFI_SUCCESS);
+    assert(OppoPlanEarlyMemory(&changed, image, pool, FALSE, &plan) != EFI_SUCCESS);
     assert(memcmp(&plan, &before, sizeof plan) == 0);
   }
   OPPO_MEMORY_RANGE bad[] = {{0x43000001, 0x4000000}, {0x43000000, 4096}, {0x40080000, 0x4000000},
                             {0x200000000ULL, 0x4000000}, {MAX_UINT64 - 4095, 0x4000000}};
   for (UINTN i = 0; i < sizeof bad / sizeof bad[0]; i++) {
-    assert(OppoPlanEarlyMemory(&info, image, bad[i], &plan) != EFI_SUCCESS);
+    assert(OppoPlanEarlyMemory(&info, image, bad[i], FALSE, &plan) != EFI_SUCCESS);
     assert(memcmp(&plan, &before, sizeof plan) == 0);
   }
   // Page rounding, not raw byte adjacency, defines the exclusion boundary.
   changed = info;
   changed.Reserved[2] = (OPPO_MEMORY_RANGE){0x5733a616, 1}; changed.ReservedCount = 3;
-  assert(OppoPlanEarlyMemory(&changed, image, pool, &plan) == EFI_COMPROMISED_DATA);
+  assert(OppoPlanEarlyMemory(&changed, image, pool, FALSE, &plan) == EFI_COMPROMISED_DATA);
+}
+
+static void acpi_reservation_ownership(void)
+{
+  OPPO_BOOT_HANDOFF info = fixture();
+  OPPO_EARLY_MEMORY_PLAN dt, acpi;
+  OPPO_MEMORY_RANGE image = {0x40080000, 0x800000};
+  OPPO_MEMORY_RANGE pool = {0x43000000, 0x4000000};
+  info.Reserved[2] = (OPPO_MEMORY_RANGE){0x7fbc0000, 0x40000};
+  info.ReservedCount = 3;
+
+  assert(OppoPlanEarlyMemory(&info, image, pool, FALSE, &dt) == EFI_SUCCESS);
+  assert(OppoPlanEarlyMemory(&info, image, pool, TRUE, &acpi) == EFI_SUCCESS);
+  assert(acpi.ProtectedCount == 4);
+  assert(dt.ProtectedType[2] == EfiBootServicesData);
+  assert(acpi.ProtectedType[0] == EfiReservedMemoryType && !acpi.ProtectedWriteBack[0]);
+  assert(acpi.ProtectedType[1] == EfiBootServicesData && acpi.ProtectedWriteBack[1]);
+  assert(acpi.ProtectedType[2] == EfiReservedMemoryType && acpi.ProtectedWriteBack[2]);
+  assert(acpi.ProtectedType[3] == EfiBootServicesCode && !acpi.ProtectedWriteBack[3]);
+  assert(memcmp(dt.Protected, acpi.Protected, sizeof acpi.Protected) == 0);
+  assert(memcmp(dt.ProtectedWriteBack, acpi.ProtectedWriteBack, sizeof acpi.ProtectedWriteBack) == 0);
 }
 
 static void private_capture(const char *path)
@@ -62,14 +83,30 @@ static void private_capture(const char *path)
   UINT8 *raw = malloc((size_t)bytes);
   assert(raw && fread(raw, 1, (size_t)bytes, f) == (size_t)bytes); fclose(f);
   OPPO_BOOT_HANDOFF info;
-  OPPO_EARLY_MEMORY_PLAN plan;
+  OPPO_EARLY_MEMORY_PLAN plan, acpi;
   // This is a supplied address for offline planning, not a measured entry x0.
   assert(OppoInspectHandoff(raw, (UINTN)bytes, 0x57300000, &info) == EFI_SUCCESS);
   assert(OppoPlanEarlyMemory(&info, (OPPO_MEMORY_RANGE){0x40080000, 0x800000},
-                            (OPPO_MEMORY_RANGE){0x43000000, 0x4000000}, &plan) == EFI_SUCCESS);
+                            (OPPO_MEMORY_RANGE){0x43000000, 0x4000000}, FALSE, &plan) == EFI_SUCCESS);
   assert(plan.DynamicReservationsDeferredToOs == 6 && plan.EmptyNodesIgnored == 1);
   printf("Offline capture-based proposal: 64 MiB pool, 8 MiB image, %zu protected ranges; no physical allocation.\n",
          (size_t)plan.ProtectedCount);
+  assert(OppoPlanEarlyMemory(&info, plan.Image, plan.Pool, TRUE, &acpi) == EFI_SUCCESS);
+  assert(acpi.ProtectedCount == plan.ProtectedCount);
+  assert(memcmp(plan.Protected, acpi.Protected, sizeof acpi.Protected) == 0);
+  assert(memcmp(plan.ProtectedWriteBack, acpi.ProtectedWriteBack, sizeof acpi.ProtectedWriteBack) == 0);
+  UINTN promoted = 0;
+  UINT64 reserved_bytes = 0;
+  for (UINTN i = 0; i < acpi.ProtectedCount; i++) {
+    if (plan.ProtectedType[i] == acpi.ProtectedType[i]) continue;
+    assert(plan.ProtectedType[i] == EfiBootServicesData);
+    assert(acpi.ProtectedType[i] == EfiReservedMemoryType && acpi.ProtectedWriteBack[i]);
+    promoted++;
+    reserved_bytes += acpi.Protected[i].Length;
+  }
+  assert(promoted == 2 && reserved_bytes == 0x81000);
+  printf("Offline ACPI policy: %zu additional reserved ranges (%llu bytes); SEC mapping decisions unchanged.\n",
+         (size_t)promoted, (unsigned long long)reserved_bytes);
   OPPO_ADDITIONAL_MEMORY_PLAN extra;
   assert(OppoPlanAdditionalMemory(&info,plan.Image,plan.Pool,
     (OPPO_MEMORY_RANGE){0x80000000,0x80000000},&extra)==EFI_SUCCESS);
@@ -159,6 +196,7 @@ int main(int argc, char **argv)
 {
   assert(argc == 1 || argc == 2);
   synthetic();
+  acpi_reservation_ownership();
   additional();
   if (argc == 2) private_capture(argv[1]);
   puts("Early memory policy, page rounding, exclusions, deferred dynamic requests and unchanged failure output passed with host sanitizers.");

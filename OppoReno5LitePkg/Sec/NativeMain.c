@@ -200,7 +200,7 @@ STATIC VOID EFIAPI ContinueBoot (VOID *Context, VOID *Unused)
   for (Index = 0; Index < State->Extra.Count; Index++)
     MapRegion (Map, ARRAY_SIZE (Map), &MapCount, State->Extra.Free[Index], ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK);
   for (Index = 0; Index < Plan->ProtectedCount; Index++)
-    if (Plan->ProtectedType[Index] == EfiBootServicesData)
+    if (Plan->ProtectedWriteBack[Index])
       MapRegion (Map, ARRAY_SIZE (Map), &MapCount, Plan->Protected[Index], ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK);
   MapRegion (Map, ARRAY_SIZE (Map), &MapCount, State->Handoff.NativeFramebuffer, ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED);
   MapRegion (Map, ARRAY_SIZE (Map), &MapCount, (OPPO_MEMORY_RANGE){OPPO_NATIVE_GICD_BASE, 0x40000}, ARM_MEMORY_REGION_ATTRIBUTE_DEVICE);
@@ -324,7 +324,8 @@ VOID EFIAPI OppoSecMain (IN CONST OPPO_SEC_ENTRY_CONTEXT *Entry)
   if (Status != EFI_SUCCESS) Stop ();
   Status = OppoPlanEarlyMemory (&State.Handoff,
     (OPPO_MEMORY_RANGE){OPPO_NATIVE_FD_BASE, OPPO_NATIVE_FD_BYTES},
-    (OPPO_MEMORY_RANGE){OPPO_NATIVE_POOL_BASE, OPPO_NATIVE_POOL_BYTES}, &State.Plan);
+    (OPPO_MEMORY_RANGE){OPPO_NATIVE_POOL_BASE, OPPO_NATIVE_POOL_BYTES},
+    FeaturePcdGet (PcdNativeSdAcpiBootLab), &State.Plan);
   if (Status != EFI_SUCCESS || !State.Handoff.NativePanelFound ||
       !State.Handoff.NativeFramebufferCoveredByReservation ||
       State.Handoff.NativeFramebuffer.Base != OPPO_NATIVE_FB_BASE) Stop ();

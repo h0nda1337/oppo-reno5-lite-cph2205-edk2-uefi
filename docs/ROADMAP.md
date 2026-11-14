@@ -16,9 +16,11 @@ La Shell UEFI, Windows Boot Manager y una pantalla de bugcheck son hitos
 intermedios. La prueba 32 alcanzó `SYSTEM_PTE_MISUSE` y la 33 terminó con
 `IO1_INITIALIZATION_FAILED`; la referencia oficial del 35 llegó al logo y a
 `IRQL_NOT_LESS_OR_EQUAL`; el 37 volvió a `SYSTEM_PTE_MISUSE` con el mismo
-medio oficial y otra variante de firmware. El arranque correcto de WinPE en
-el OPPO y el de Windows 11 siguen pendientes. La aceleración 3D de PowerVR no es
-un criterio de éxito del primer arranque con pantalla básica.
+medio oficial y otra variante de firmware. El 39 mostró una ventana de
+`cmd.exe` de WinPE en el OPPO. Quedan por verificar la ejecución de comandos,
+la entrada y la repetición del arranque, además del arranque de Windows 11.
+La aceleración 3D de PowerVR queda para una etapa posterior al arranque con
+pantalla básica.
 
 Se mantiene el código propio de entrada y controladores específicos, la vía de
 regreso a Android, los respaldos verificados, el mínimo del 20 % de batería
@@ -175,9 +177,22 @@ validación independiente; su funcionamiento no se presumirá por compartir SoC.
 - [x] Probar una copia diagnóstica de la referencia oficial (38): `ver` y
   CrashControl comprobados en VM; en el OPPO repite `SYSTEM_PTE_MISUSE` con
   filas numéricas parcialmente ocultas. No hay cuatro parámetros completos.
-  Recovery original restaurado; trabajo en pausa por solicitud del propietario.
-- [ ] Resolver el fallo de arranque actual y validar un entorno WinPE utilizable
-  desde microSD, con entrada básica y un comando comprobado.
+  Recovery original restaurado al cierre de esa prueba.
+- [x] Separar en el plan de memoria los mapeos de SEC del tipo UEFI de las
+  reservas estáticas para el perfil ACPI (39). Verificado con la captura de
+  FDT, pruebas de PC y compilación ARM64.
+- [x] Alcanzar una ventana de consola de WinPE desde la microSD física (39).
+  ADB confirmó el retorno a Android. El propietario informó que la consola
+  seguía vacía y que el hub USB parecía estar sin alimentación.
+- [x] Comprobar en VM la versión automática y el retorno de `wpeinit` con
+  marcas en `Startnet.cmd` (40).
+- [x] Confirmar la ejecución del comando `title` de `Startnet.cmd` en el OPPO
+  (40). Apareció el título específico del diagnóstico y la consola quedó vacía.
+- [x] Mostrar la versión de WinPE y el retorno de `wpeinit` en el título
+  de consola en una VM ARM64 (41). Resultado físico pendiente de observación.
+- [ ] Confirmar la versión del sistema y el retorno de `wpeinit` en el OPPO.
+- [ ] Validar un entorno WinPE utilizable desde microSD, con entrada básica
+  y un comando comprobado.
 - [ ] Repetir y documentar el arranque correcto de WinPE desde la tarjeta.
 - [ ] Después de WinPE, validar Windows 11 ARM64 desde microSD hasta el escritorio
   con entrada básica y comprobar un nuevo arranque.

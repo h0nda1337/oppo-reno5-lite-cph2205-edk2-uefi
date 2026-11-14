@@ -99,6 +99,12 @@ REVIEWED_IMAGES = {
         (2024052, '7daa7823b2b537f7ebce9e73ec1d2fb06b17c92f9ee2b6e349f098c4651419e7'),
     'docs/images/native-winpe-reference-parameters-lab-38-bugcheck-detail.jpg':
         (1327598, '20aadc302fa4167e9089fa9d852953284d7d78fb6c3471a8a9df3790defce256'),
+    'docs/images/native-winpe-reserved-memory-lab-39-console.jpg':
+        (924701, '80b4fbd37c380deef5fb0f6d298d9f8528dffab27adcd6e66ac641569d2c2b2b'),
+    'docs/images/native-winpe-reserved-memory-lab-39-console-detail.jpg':
+        (1008440, '83b72b861568c085598eb12705e05edfbcdbc0a952318180f03d329229542fd8'),
+    'docs/images/native-winpe-startnet-marker-lab-40-console.jpg':
+        (1021640, '3e57b6283ab6877aba64cb78e4d6ea7a917d2584c5c42a289f9e20e59b7f07a7'),
 }
 PRIVATE = [
     re.compile(rb'-----BEGIN (?:RSA |EC |OPENSSH |ENCRYPTED )?PRIVATE KEY-----'),

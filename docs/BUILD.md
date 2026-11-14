@@ -162,6 +162,13 @@ Las solicitudes dinámicas se difieren al sistema operativo según
 No se asignan como reservas UEFI. Los nodos no vacíos sin dirección o tamaño y
 las exclusiones redondeadas superpuestas hacen fallar el plan.
 
+El perfil de arranque ACPI desde microSD conserva también las demás reservas
+estáticas como `EfiReservedMemoryType`, porque Windows recibe ACPI y el mapa
+UEFI. FDT e initrd siguen siendo datos temporales del arranque. Esta decisión
+de propiedad no modifica los mapeos de SEC. La comparación de ambos perfiles
+sobre la captura comprueba que dos regiones (516 KiB) cambian de tipo, con los
+mismos límites y mapeos de SEC.
+
 ```bash
 EDK2_HEADERS=/ruta/edk2 bash scripts/build_memory_plan_lib.sh /ruta/privada/runtime.dtb
 ```
