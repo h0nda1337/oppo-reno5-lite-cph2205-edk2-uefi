@@ -38,7 +38,8 @@ referencia oficial WinPE del 35, la lectura de superficies de pantalla del 36
 el bugcheck del intento de limpieza del 37 y las dos capturas del
 diagnóstico de parámetros de la referencia oficial del 38 y las dos fotos
 de la consola de WinPE en el 39 y la captura de la consola de diagnóstico
-del 40 están revisadas y fijadas por ruta, tamaño y SHA-256 en
+del 40 y las capturas de los títulos de la etapa 3 del 41 y de la etapa 4
+del 42 están revisadas y fijadas por ruta, tamaño y SHA-256 en
 `check_publication.py`. Se retiraron los
 metadatos personales de cámara; se conservaron orientación y perfil de color,
 sin recomprimir los datos de imagen. Esa excepción corresponde exclusivamente
@@ -74,8 +75,10 @@ a `docs/images/native-mmu-probe.jpg`, `docs/images/native-dxe-shell-lab-01.jpg`,
 `docs/images/native-winpe-reference-parameters-lab-38-bugcheck.jpg`
 `docs/images/native-winpe-reference-parameters-lab-38-bugcheck-detail.jpg`,
 `docs/images/native-winpe-reserved-memory-lab-39-console.jpg`,
-`docs/images/native-winpe-reserved-memory-lab-39-console-detail.jpg` y
-`docs/images/native-winpe-startnet-marker-lab-40-console.jpg`.
+`docs/images/native-winpe-reserved-memory-lab-39-console-detail.jpg`,
+`docs/images/native-winpe-startnet-marker-lab-40-console.jpg`,
+`docs/images/native-winpe-startnet-title-lab-41-stage3.jpg` y
+`docs/images/native-winpe-wpeinit-redirect-lab-42-stage4.jpg`.
 Las demás imágenes y binarios siguen
 requiriendo revisión y no se aceptan automáticamente.
 

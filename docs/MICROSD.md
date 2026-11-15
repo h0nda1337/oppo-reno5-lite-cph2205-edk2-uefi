@@ -1217,9 +1217,42 @@ y de `wpeinit`. La cuarta añade el código de retorno de `wpeinit`.
 La comprobación de 17 533 rutas del WIM detectó un único cambio de datos,
 en `Windows/System32/startnet.cmd`, y conservó los metadatos comparados.
 La VM ARM64 EL1/SMC mostró `OPPO PE41 4 WPEINIT=0` con la versión
-`10.0.26100.1` en el título y llegó al prompt. Falta comprobar en el OPPO
-si el título progresa y si la consola admite entrada física.
+`10.0.26100.1` en el título y llegó al prompt.
 
 Antes de la prueba física se verificaron los 89 archivos activos de la
 microSD y se guardó el WIM anterior para restaurarlo. Fastboot confirmó que
 se volvió a escribir el recovery del 39 y aceptó el arranque directo.
+
+En la repetición del intento 41, la foto del OPPO muestra
+`OPPO PE41 3 BEFORE WPEINIT` con `Microsoft Windows [Version 10.0.26100.1]`.
+El resultado de `ver` se leyó del archivo temporal y llegó al título. Es la
+primera confirmación de ese comando en WinPE desde la microSD física de este
+proyecto. El cuerpo de la consola seguía vacío. El propietario informó que el
+título quedó en la etapa 3 y que reinició el equipo. ADB confirmó el regreso
+a Android. La captura deja por distinguir si el segundo `echo` o `wpeinit`
+impidió que apareciera la etapa 4. Queda pendiente la entrada interactiva.
+[Evidencia fotográfica](../evidence/winpe-startnet-title-lab-41-photo.json)
+
+![El título de WinPE muestra el resultado de ver en el OPPO](images/native-winpe-startnet-title-lab-41-stage3.jpg)
+
+### Llamada directa a `wpeinit` (42)
+
+Esta variante elimina el segundo `echo` del intento 41. `Startnet.cmd`
+muestra `3 CALLING WPEINIT` e invoca `wpeinit.exe` inmediatamente después,
+redirigiendo su salida a un archivo temporal del disco RAM. La etapa 4
+muestra el código de salida. La revisión de 17 533 rutas del WIM encontró
+un solo archivo con contenido distinto, `Windows/System32/startnet.cmd`.
+El atributo de archivo disperso de ese script pasó a normal al reempaquetarlo.
+
+La VM ARM64 EL1/SMC mostró la versión `10.0.26100.1`, el título
+`OPPO PE42 4 WPEINIT=0` y el prompt.
+
+En el OPPO, la captura del arranque físico desde microSD muestra
+`OPPO PE42 4 WPEINIT=0 - Microsoft Windows [Version 10.0.26100.1]`.
+El título confirma que `ver` se ejecutó y que `wpeinit` devolvió `0`.
+El interior de la ventana sigue vacío. Queda por comprobar si la consola
+dibuja el texto de su búfer y si recibe entrada del teclado. Tras la prueba,
+el observador ADB confirmó que Android completó su arranque.
+[Evidencia fotográfica](../evidence/winpe-wpeinit-redirect-lab-42-photo.json)
+
+![Título del intento 42 con el código de retorno de wpeinit](images/native-winpe-wpeinit-redirect-lab-42-stage4.jpg)

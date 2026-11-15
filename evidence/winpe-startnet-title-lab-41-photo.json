@@ -1,0 +1,36 @@
+{
+  "attempt": 41,
+  "variant": "Physical repeat of the phase 41 startup title diagnostic",
+  "physical_observations": {
+    "console_title": "OPPO PE41 3 BEFORE WPEINIT - Microsoft Windows [Version 10.0.26100.1]",
+    "ver_output_in_title": "Microsoft Windows [Version 10.0.26100.1]",
+    "console_interior_blank": true,
+    "stage_4_confirmed": false,
+    "wpeinit_completion_confirmed": false,
+    "interactive_input_confirmed": false
+  },
+  "owner_report_after_photo": "The owner reported that the display remained at that point and later reported rebooting the phone.",
+  "post_attempt_adb_verification": {
+    "model": "CPH2205",
+    "sys.boot_completed": "1",
+    "battery_percent": 41
+  },
+  "limits": "The stage 3 title confirms automatic ver output on the phone. The capture does not establish whether the following echo returned, whether wpeinit ran or completed, or whether keyboard input worked.",
+  "photos": [
+    {
+      "public_path": "docs/images/native-winpe-startnet-title-lab-41-stage3.jpg",
+      "bytes": 935705,
+      "sha256": "e8744f547d094801a93ad5bac9da1f143248b7a580b6011d0f57730ab13892d3",
+      "source_orientation_tag": 1,
+      "orientation": 1,
+      "icc_segments_preserved": 1,
+      "compressed_pixel_scans_preserved": true,
+      "compressed_scan_sha256": "39793ec02c956af25513e402d8d923d847668dd01173edb07d3db54c260e6f70",
+      "retained_exif_tags": [
+        "Orientation"
+      ],
+      "visible_personal_identifiers": false,
+      "visual_review": "The physical OPPO displays the title OPPO PE41 3 BEFORE WPEINIT - Microsoft Windows [Version 10.0.26100.1]. The console interior is blank."
+    }
+  ]
+}

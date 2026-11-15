@@ -1,0 +1,36 @@
+{
+  "attempt": 42,
+  "variant": "Physical startup title diagnostic with console output redirection during wpeinit",
+  "physical_observations": {
+    "console_title": "OPPO PE42 4 WPEINIT=0 - Microsoft Windows [Version 10.0.26100.1]",
+    "ver_output_in_title": "Microsoft Windows [Version 10.0.26100.1]",
+    "wpeinit_exit_code_in_title": 0,
+    "stage_4_confirmed": true,
+    "console_interior_blank": true,
+    "orange_state_visible": true,
+    "interactive_input_confirmed_at_time_of_photo": false,
+    "return_to_android_confirmed_at_time_of_photo": false
+  },
+  "post_attempt_adb_verification": {
+    "model": "CPH2205",
+    "sys.boot_completed": "1"
+  },
+  "limits": "The phase 42 title confirms automatic ver output and that wpeinit returned 0 on the phone. Individual devices and keyboard input remain unverified.",
+  "photos": [
+    {
+      "public_path": "docs/images/native-winpe-wpeinit-redirect-lab-42-stage4.jpg",
+      "bytes": 719901,
+      "sha256": "1d135647de5dd53352c02b31212b455ee4d8ecb3b3633909330d1f388e24f1e8",
+      "source_orientation_tag": 1,
+      "orientation": 1,
+      "icc_segments_preserved": 1,
+      "compressed_pixel_scans_preserved": true,
+      "compressed_scan_sha256": "0690914cb23a4ec5666a01fdbccfddc871e67265637d0709847e7396da57f728",
+      "retained_exif_tags": [
+        "Orientation"
+      ],
+      "visible_personal_identifiers": false,
+      "visual_review": "The physical OPPO displays the title OPPO PE42 4 WPEINIT=0 - Microsoft Windows [Version 10.0.26100.1]. The console interior is blank and Orange State is visible."
+    }
+  ]
+}

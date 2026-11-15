@@ -105,6 +105,10 @@ REVIEWED_IMAGES = {
         (1008440, '83b72b861568c085598eb12705e05edfbcdbc0a952318180f03d329229542fd8'),
     'docs/images/native-winpe-startnet-marker-lab-40-console.jpg':
         (1021640, '3e57b6283ab6877aba64cb78e4d6ea7a917d2584c5c42a289f9e20e59b7f07a7'),
+    'docs/images/native-winpe-startnet-title-lab-41-stage3.jpg':
+        (935705, 'e8744f547d094801a93ad5bac9da1f143248b7a580b6011d0f57730ab13892d3'),
+    'docs/images/native-winpe-wpeinit-redirect-lab-42-stage4.jpg':
+        (719901, '1d135647de5dd53352c02b31212b455ee4d8ecb3b3633909330d1f388e24f1e8'),
 }
 PRIVATE = [
     re.compile(rb'-----BEGIN (?:RSA |EC |OPENSSH |ENCRYPTED )?PRIVATE KEY-----'),
